@@ -14,16 +14,11 @@ import java.util.Date;
 public class MainServlet extends HttpServlet {
 
     private static final String DEFAULT_PATH = System.getProperty("user.home");
+    private static final String BASE_DIR = "D:\\filemanager";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        String uri = req.getRequestURI();
-        if (uri.endsWith("login.html")) {
-            resp.sendRedirect("login.html");
-            return;
-        }
 
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) {
@@ -31,29 +26,30 @@ public class MainServlet extends HttpServlet {
             return;
         }
 
+        String userHomePath = BASE_DIR + File.separator + user.getUsername();
+        File userHomeDir = new File(userHomePath);
+        if (!userHomeDir.exists()) {
+            userHomeDir.mkdirs();
+        }
+
         String dirPath = req.getParameter("path");
         if (dirPath != null) {
             dirPath = URLDecoder.decode(dirPath, "UTF-8");
-        }
-
-        File dir = null;
-        File[] files;
-
-        if (dirPath == null || dirPath.isEmpty()) {
-            files = File.listRoots();
-            dirPath = null;
         } else {
-            dir = new File(dirPath);
-            if (!dir.exists() || !dir.isDirectory()) {
-                dir = new File(DEFAULT_PATH);
-                dirPath = dir.getAbsolutePath();
-            }
-            files = dir.listFiles();
+            dirPath = userHomePath;
         }
 
+        File dir = new File(dirPath);
+
+        if (!dir.getCanonicalPath().startsWith(userHomeDir.getCanonicalPath())) {
+            dir = userHomeDir;
+            dirPath = userHomePath;
+        }
+
+        File[] files = dir.listFiles();
         req.setAttribute("files", files);
-        req.setAttribute("dirPath", dirPath);
-        req.setAttribute("parentPath", dir != null ? dir.getParent() : null);
+        req.setAttribute("dirPath", dir.getAbsolutePath());
+        req.setAttribute("parentPath", dir.getParent());
         req.setAttribute("currentTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         req.setAttribute("username", user.getUsername());
 
