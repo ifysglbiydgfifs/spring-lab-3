@@ -13,15 +13,22 @@
             File[] files = (File[]) request.getAttribute("files");
         %>
 
-        <h1>
+        <h2>Welcome, ${username}</h2>
+        <p>Page generated on: <%= currentTime %></p>
+
+        <form action="logout" method="get">
+            <button>Logout</button>
+        </form>
+
+        <h3>
             <% if (dirPath == null) { %>
                 Available Disks:
             <% } else { %>
                 Contents of Directory: <%= dirPath %>
             <% } %>
-        </h1>
+        </h3>
 
-        <p>Page generated on: <%= currentTime %></p>
+
 
         <% if (parentPath != null) {
                String encodedParent = URLEncoder.encode(parentPath, "UTF-8");

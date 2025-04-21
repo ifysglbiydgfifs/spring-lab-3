@@ -2,9 +2,7 @@ package com.example.servlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +10,7 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@WebServlet("/")
+@WebServlet("/files")
 public class MainServlet extends HttpServlet {
 
     private static final String DEFAULT_PATH = System.getProperty("user.home");
@@ -20,6 +18,18 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        String uri = req.getRequestURI();
+        if (uri.endsWith("login.html")) {
+            resp.sendRedirect("login.html");
+            return;
+        }
+
+        User user = (User) req.getSession().getAttribute("user");
+        if (user == null) {
+            resp.sendRedirect("login.html");
+            return;
+        }
 
         String dirPath = req.getParameter("path");
         if (dirPath != null) {
@@ -44,9 +54,8 @@ public class MainServlet extends HttpServlet {
         req.setAttribute("files", files);
         req.setAttribute("dirPath", dirPath);
         req.setAttribute("parentPath", dir != null ? dir.getParent() : null);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        req.setAttribute("currentTime", sdf.format(new Date()));
+        req.setAttribute("currentTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        req.setAttribute("username", user.getUsername());
 
         req.getRequestDispatcher("mypage.jsp").forward(req, resp);
     }
