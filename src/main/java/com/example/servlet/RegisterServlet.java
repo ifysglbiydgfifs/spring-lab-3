@@ -4,6 +4,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.io.IOException;
 
@@ -16,7 +17,9 @@ public class RegisterServlet extends HttpServlet {
         String email = req.getParameter("email");
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            if (session.get(User.class, username) != null) {
+            Query<User> query = session.createQuery("FROM User WHERE username = :username", User.class);
+            query.setParameter("username", username);
+            if (query.uniqueResult() != null) {
                 resp.getWriter().write("User already exists.");
                 return;
             }

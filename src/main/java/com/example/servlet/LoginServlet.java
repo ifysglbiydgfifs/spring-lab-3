@@ -15,7 +15,9 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("password");
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            User user = session.get(User.class, username);
+            Query<User> query = session.createQuery("FROM User WHERE username = :username", User.class);
+            query.setParameter("username", username);
+            User user = query.uniqueResult();
             if (user != null && user.getPassword().equals(password)) {
                 req.getSession().setAttribute("user", user);
                 resp.sendRedirect("files");
