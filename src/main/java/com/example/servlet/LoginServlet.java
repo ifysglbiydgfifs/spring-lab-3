@@ -1,6 +1,7 @@
 package com.example.servlet;
 
-import com.example.dao.UserDAO;
+import com.example.dao.UserDao;
+import com.example.model.User;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -9,7 +10,7 @@ import java.io.IOException;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private final UserDAO userDAO = new UserDAO();
+    private final UserDao userDao = new UserDao();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -17,7 +18,7 @@ public class LoginServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        User user = userDAO.findByUsername(username);
+        User user = userDao.findByUsername(username);
         if (user != null && user.getPassword().equals(password)) {
             req.getSession().setAttribute("user", user);
             resp.sendRedirect("files");

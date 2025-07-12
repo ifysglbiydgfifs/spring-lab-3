@@ -1,12 +1,12 @@
 package com.example.dao;
 
-import com.example.servlet.User;
+import com.example.model.User;
 import com.example.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-public class UserDAO {
+public class UserDao {
 
     public void save(User user) {
         Transaction tx = null;
